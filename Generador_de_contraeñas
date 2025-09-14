@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Contraseñas Seguras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .password-display {
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+        }
+        .copy-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .strength-bar {
+            height: 12px;
+            width: 100%;
+            border-radius: 9999px;
+            transition: background-color 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-200 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Container -->
+    <div class="bg-white p-8 md:p-12 rounded-3xl shadow-2xl max-w-2xl w-full flex flex-col items-center text-center">
+        
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            Generador de Contraseñas
+        </h1>
+        
+        <p class="text-gray-600 mb-8 max-w-md">
+            Crea contraseñas fuertes y únicas para proteger tus cuentas en línea.
+        </p>
+        
+        <!-- Password Display -->
+        <div class="w-full flex items-center bg-gray-100 rounded-xl overflow-hidden mb-2 shadow-sm">
+            <input 
+                id="password-output" 
+                type="text" 
+                readonly 
+                class="flex-1 py-4 px-6 text-gray-800 text-lg font-mono truncate bg-transparent focus:outline-none" 
+                value="Haz clic en Generar"
+            />
+            <button 
+                id="copy-button" 
+                class="flex items-center justify-center p-4 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-r-xl transition-colors"
+                title="Copiar al portapapeles"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Password Strength Indicator -->
+        <div class="w-full mb-6 text-left">
+            <div id="strength-bar" class="strength-bar bg-gray-300 mb-2"></div>
+            <p id="strength-text" class="text-sm font-semibold text-gray-700">Débil</p>
+        </div>
+        
+        <!-- Password Options -->
+        <div class="w-full mb-6 text-left">
+            <div class="mb-4">
+                <label for="length" class="block text-gray-700 font-semibold mb-2">Longitud de la contraseña:</label>
+                <div class="flex items-center gap-4">
+                    <input type="range" id="length" min="8" max="24" value="12" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+                    <span id="length-value" class="text-gray-700 font-bold">12</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <label class="flex items-center gap-2 text-gray-700">
+                    <input type="checkbox" id="uppercase" checked class="form-checkbox text-blue-600 rounded-sm">
+                    Mayúsculas (A-Z)
+                </label>
+                <label class="flex items-center gap-2 text-gray-700">
+                    <input type="checkbox" id="lowercase" checked class="form-checkbox text-blue-600 rounded-sm">
+                    Minúsculas (a-z)
+                </label>
+                <label class="flex items-center gap-2 text-gray-700">
+                    <input type="checkbox" id="numbers" checked class="form-checkbox text-blue-600 rounded-sm">
+                    Números (0-9)
+                </label>
+                <label class="flex items-center gap-2 text-gray-700">
+                    <input type="checkbox" id="symbols" class="form-checkbox text-blue-600 rounded-sm">
+                    Símbolos (!@#$)
+                </label>
+            </div>
+        </div>
+        
+        <!-- Action Button -->
+        <button id="generate-button" class="w-full py-4 px-6 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105">
+            Generar Contraseña
+        </button>
+        
+        <!-- Real Ad Unit (Simulated) -->
+        <div id="real-ad-unit" class="w-full mt-8 bg-gray-300 rounded-lg p-6 shadow-inner text-gray-600 text-center font-bold">
+            <!-- Aquí iría el código de Google AdSense -->
+            Espacio para el Anuncio
+        </div>
+
+    </div>
+
+    <script>
+        const passwordOutput = document.getElementById('password-output');
+        const lengthInput = document.getElementById('length');
+        const lengthValueSpan = document.getElementById('length-value');
+        const generateButton = document.getElementById('generate-button');
+        const copyButton = document.getElementById('copy-button');
+        
+        const uppercaseCheckbox = document.getElementById('uppercase');
+        const lowercaseCheckbox = document.getElementById('lowercase');
+        const numbersCheckbox = document.getElementById('numbers');
+        const symbolsCheckbox = document.getElementById('symbols');
+        
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+
+        // Update length value display
+        lengthInput.addEventListener('input', () => {
+            lengthValueSpan.textContent = lengthInput.value;
+            generatePassword(); // Regenerar contraseña al cambiar la longitud
+        });
+
+        // Function to check password strength
+        function checkStrength(password) {
+            let score = 0;
+            const length = password.length;
+            
+            // Score based on length
+            if (length >= 8) score += 1;
+            if (length >= 12) score += 1;
+            if (length >= 16) score += 1;
+            
+            // Score based on character types
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumbers = /[0-9]/.test(password);
+            const hasSymbols = /[!@#$%^&*()-_+=[]{}|;:,.<>?]/.test(password);
+
+            if (hasUppercase) score += 1;
+            if (hasLowercase) score += 1;
+            if (hasNumbers) score += 1;
+            if (hasSymbols) score += 1;
+
+            return score;
+        }
+
+        // Update strength indicator
+        function updateStrengthIndicator(password) {
+            const score = checkStrength(password);
+            let color, text;
+
+            if (score <= 2) {
+                color = 'bg-red-500';
+                text = 'Débil';
+            } else if (score <= 5) {
+                color = 'bg-yellow-500';
+                text = 'Media';
+            } else {
+                color = 'bg-green-500';
+                text = 'Fuerte';
+            }
+
+            strengthBar.className = `strength-bar ${color}`;
+            strengthText.textContent = text;
+        }
+
+        // Generate password function
+        function generatePassword() {
+            const length = lengthInput.value;
+            let charset = '';
+            
+            if (uppercaseCheckbox.checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (lowercaseCheckbox.checked) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (numbersCheckbox.checked) charset += '0123456789';
+            if (symbolsCheckbox.checked) charset += '!@#$%^&*()-_+=[]{}|;:,.<>?';
+
+            if (charset.length === 0) {
+                passwordOutput.value = 'Selecciona al menos un tipo de caracter.';
+                updateStrengthIndicator('');
+                return;
+            }
+
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+
+            passwordOutput.value = password;
+            updateStrengthIndicator(password);
+        }
+
+        // Copy password to clipboard
+        copyButton.addEventListener('click', () => {
+            passwordOutput.select();
+            document.execCommand('copy');
+            copyButton.textContent = '¡Copiado!';
+            setTimeout(() => {
+                copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>`;
+            }, 2000);
+        });
+        
+        // Event listeners for checkboxes
+        uppercaseCheckbox.addEventListener('change', generatePassword);
+        lowercaseCheckbox.addEventListener('change', generatePassword);
+        numbersCheckbox.addEventListener('change', generatePassword);
+        symbolsCheckbox.addEventListener('change', generatePassword);
+
+        // Event listener for generate button
+        generateButton.addEventListener('click', generatePassword);
+
+        // Generate initial password on page load
+        generatePassword();
+    </script>
+</body>
+</html>
+
